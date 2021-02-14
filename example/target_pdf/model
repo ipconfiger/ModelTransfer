@@ -1,0 +1,24 @@
+// /Users/alex/Projects/workspace/ModelTransfer/example/model.mod
+digraph models {
+	Student [label="Student[ 学生
+]
+------------------------------------
+name	:	str		姓名
+gender	:	int		性别
+classes	:	Classes		年级" fontsize=6 height=1.2000000000000002 shape=box]
+	Teacher [label="Teacher[ 老师
+]
+------------------------------------
+name	:	str		姓名
+subject	:	str		学科
+classes	:	Classes		年级" fontsize=6 height=1.2000000000000002 shape=box]
+	Classes [label="Classes[ 班级
+]
+------------------------------------
+name	:	str		班级名
+teacher	:	Teacher		班主任
+students	:	Student		学生列表" fontsize=6 height=1.2000000000000002 shape=box]
+	Teacher -> Classes [label="classes->Classes n->1" fontsize=6]
+	Classes -> Teacher [label="teacher->Teacher n->1" fontsize=6]
+	Student -> Classes [label="n<->n" dir=both fontsize=6]
+}

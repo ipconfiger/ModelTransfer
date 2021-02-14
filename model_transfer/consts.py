@@ -1,0 +1,12 @@
+BUILIN_TYPE_STR = 'str'
+BUILIN_TYPE_INT = 'int'
+BUILIN_TYPE_FLOAT = 'float'
+BUILIN_TYPE_DOUBLE = 'double'
+BUILIN_TYPE_BOOL = 'bool'
+
+BUILIN_TYPES = [BUILIN_TYPE_STR, BUILIN_TYPE_INT, BUILIN_TYPE_FLOAT, BUILIN_TYPE_DOUBLE, BUILIN_TYPE_BOOL]
+
+
+class RelationType(object):
+    POINTTO = 'point-to'
+    CONTAINS = 'contains'
