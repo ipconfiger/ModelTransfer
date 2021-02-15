@@ -1,5 +1,5 @@
 import os
-from consts import *
+from .consts import *
 
 
 class FormatToTrans(object):

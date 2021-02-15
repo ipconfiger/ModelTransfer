@@ -1,6 +1,6 @@
 from graphviz import Digraph
 import os
-from consts import *
+from .consts import *
 
 class FormatToPdf(object):
     name = 'pdf'

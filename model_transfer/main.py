@@ -1,11 +1,11 @@
 import sys
 import os
 
-from draw_formattor import FormatToPdf
-from transform import ModelFile
-from jorm_formmator import FormatToJORM
-from trans_formattor import FormatToTrans
-from db_formmator import FormatToDatabase
+from .draw_formattor import FormatToPdf
+from .transform import ModelFile
+from .jorm_formmator import FormatToJORM
+from .trans_formattor import FormatToTrans
+from .db_formmator import FormatToDatabase
 
 OUTPUT_TYPES = ['jm', 'tm', 'dm', 'pdf']
 
