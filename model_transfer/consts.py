@@ -6,6 +6,13 @@ BUILIN_TYPE_BOOL = 'bool'
 
 BUILIN_TYPES = [BUILIN_TYPE_STR, BUILIN_TYPE_INT, BUILIN_TYPE_FLOAT, BUILIN_TYPE_DOUBLE, BUILIN_TYPE_BOOL]
 
+JORM_FIELD_STR = 'StrField'
+JORM_FIELD_INT = 'IntField'
+JORM_FIELD_BOOL = 'BoolField'
+JORM_FIELD_STR = 'StrField'
+JORM_FIELD_STR = 'StrField'
+
+
 
 class RelationType(object):
     POINTTO = 'point-to'

@@ -73,14 +73,14 @@ class FormatToJORM(object):
             type_def_lines.append("")
             type_def_lines.append(f"    {classwrapper.class_name}();")
             type_def_lines.append("")
-            type_def_lines.append("    %s,make({" % classwrapper.class_name)
+            type_def_lines.append("    %s.make({" % classwrapper.class_name)
             type_def_lines.append("        this.uuid,")
             for fieldwrapper in classwrapper.fields:
                 if not fieldwrapper.is_list:
                     if fieldwrapper.is_complex:
-                        type_def_lines.append(f"        this.{fieldwrapper.name}_id;")
+                        type_def_lines.append(f"        this.{fieldwrapper.name}_id,")
                     else:
-                        type_def_lines.append(f"        this.{fieldwrapper.name};")
+                        type_def_lines.append(f"        this.{fieldwrapper.name},")
             type_def_lines.append("    }): this.uuid = this.uuid??Uuid().v1(),")
             type_def_lines.append("        this.createTs = DateTime.now().millisecondsSinceEpoch,")
             type_def_lines.append("        this.updateTs = DateTime.now().millisecondsSinceEpoch;")
@@ -147,6 +147,8 @@ class FormatToJORM(object):
             orm_lines.append("    final createTs = IntField('create_ts');")
             orm_lines.append("    final updateTs = IntField('update_ts');")
             for fieldwrapper in classwrapper.fields:
+                fieldwrapper.field_type
+
                 orm_lines.append(f"    final {fieldwrapper.name} = IntField('{fieldwrapper.name.lower()}');")
             orm_lines.append("    Map<String, Field> _fields;")
             orm_lines.append("")
