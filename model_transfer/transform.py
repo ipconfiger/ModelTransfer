@@ -74,11 +74,15 @@ class FieldWrapper(object):
         self.is_complex = False
         self.is_list = False
         self.field_length = 0
+        self.required = False
         self.global_env = g
         self.classwrapper = c
         self.process()
 
     def process(self):
+        if self.field_type.endswith("*"):
+            self.required = True
+            self.field_type = self.field_type.replace("*", '')
         try:
             type_length = between(self.field_type, '(', ')')
             self.field_length = int(type_length)

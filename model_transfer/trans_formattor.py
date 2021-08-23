@@ -2,6 +2,9 @@ import os
 from .consts import *
 
 
+def to_underlined(raw_str):
+    return "".join([f'_{w.lower()}' if w == w.upper() else w for w in raw_str])
+
 class FormatToTrans(object):
     name = 'tm'
 
@@ -28,7 +31,8 @@ class FormatToTrans(object):
             BUILIN_TYPE_INT: 'int',
             BUILIN_TYPE_FLOAT: 'double',
             BUILIN_TYPE_DOUBLE: 'double',
-            BUILIN_TYPE_BOOL: 'bool'
+            BUILIN_TYPE_BOOL: 'bool',
+            BUILIN_TYPE_MAP: 'Map<String, dynamic>',
         }
         if fieldwrapper.is_list:
             return f"List<{fieldwrapper.field_type}>"
@@ -47,7 +51,8 @@ class FormatToTrans(object):
             BUILIN_TYPE_INT: '0',
             BUILIN_TYPE_FLOAT: '0.0',
             BUILIN_TYPE_DOUBLE: '0.0',
-            BUILIN_TYPE_BOOL: 'Field'
+            BUILIN_TYPE_BOOL: 'false',
+            BUILIN_TYPE_MAP: '{}'
         }
         return mapper[fieldwrapper.field_type]
 
@@ -67,49 +72,48 @@ class FormatToTrans(object):
             dart_lines.append(f"class {classwrapper.class_name} " + "{")
             dart_lines.append("  // consts fields")
             for fieldwrapper in classwrapper.fields:
-                dart_lines.append(f"  static const {fieldwrapper.name.upper()}KEY = \"{fieldwrapper.name.lower()}\";")
+                dart_lines.append(f"  static const {to_underlined(fieldwrapper.name).upper()}_KEY = '{to_underlined(fieldwrapper.name)}';")
             dart_lines.append("")
             for fieldwrapper in classwrapper.fields:
-                dart_lines.append(f"  {self.type_map(fieldwrapper)} {fieldwrapper.name};")
+                dart_lines.append(f"  late {self.type_map(fieldwrapper)} {fieldwrapper.name};")
             dart_lines.append("")
             dart_lines.append("  // constructors")
             dart_lines.append(f"  {classwrapper.class_name}();")
             dart_lines.append("")
-            constrctor_params = ", ".join([f"this.{fieldwrapper.name}" for fieldwrapper in classwrapper.fields])
+            constrctor_params = ", ".join([f"required this.{fieldwrapper.name}" for fieldwrapper in classwrapper.fields])
             dart_lines.append("  %(name)s.make({%(p)s});" % dict(name=classwrapper.class_name, p=constrctor_params))
             dart_lines.append("")
-            dart_lines.append("  %s fromMap(Map map) {" % classwrapper.class_name)
+            dart_lines.append("  %s.fromMap(Map map) {" % classwrapper.class_name)
             for fieldwrapper in classwrapper.fields:
                 if fieldwrapper.is_complex:
                     if fieldwrapper.is_list:
-                        dart_lines.append(f"    this.{fieldwrapper.name} = <{fieldwrapper.name}>[];")
-                        dart_lines.append(f"    for (final map in map[{fieldwrapper.name.upper()}KEY]) " + "{")
-                        dart_lines.append(f"        this.{fieldwrapper.name}.add({fieldwrapper.field_type}().fromMap(map))")
+                        dart_lines.append(f"    {fieldwrapper.name} = <{fieldwrapper.field_type}>[];")
+                        dart_lines.append(f"    for (final map in map[{to_underlined(fieldwrapper.name).upper()}_KEY]) " + "{")
+                        dart_lines.append(f"        {fieldwrapper.name}.add({fieldwrapper.field_type}.fromMap(map));")
                         dart_lines.append("    }")
                     else:
-                        dart_lines.append(f"    this.{fieldwrapper.name} = {fieldwrapper.field_type}().fromMap(map[{fieldwrapper.name.upper()}KEY])")
+                        dart_lines.append(f"    {fieldwrapper.name} = {fieldwrapper.field_type}.fromMap(map[{to_underlined(fieldwrapper.name).upper()}_KEY]);")
                 else:
-                    dart_lines.append(f"    this.{fieldwrapper.name} = map[{fieldwrapper.name.upper()}KEY]")
-            dart_lines.append("    return this;")
+                    dart_lines.append(f"    {fieldwrapper.name} = map[{to_underlined(fieldwrapper.name).upper()}_KEY];")
             dart_lines.append("  }")
             dart_lines.append("")
             dart_lines.append("  Map asMap() {")
+            dart_lines.append("    var map = <String, dynamic>{};")
             for fieldwrapper in classwrapper.fields:
                 if fieldwrapper.is_complex:
                     if fieldwrapper.is_list:
-                        dart_lines.append(f"      final {fieldwrapper.name}List = <Map>[];")
-                        dart_lines.append(f"      for (final item in {fieldwrapper.name}List) " + "{")
-                        dart_lines.append(f"        {fieldwrapper.name}List.add(item.asMap());")
-                        dart_lines.append("      }")
+                        dart_lines.append(f"    final {fieldwrapper.name}List = <Map>[];")
+                        dart_lines.append(f"    for (final item in {fieldwrapper.name}) " + "{")
+                        dart_lines.append(f"      {fieldwrapper.name}List.add(item.asMap());")
+                        dart_lines.append("    }")
+                        dart_lines.append(f"    map[{to_underlined(fieldwrapper.name).upper()}_KEY] = {fieldwrapper.name}List;")
                     else:
-                        dart_lines.append(f"      {fieldwrapper.name.upper()}KEY: this.{fieldwrapper.name}.asMap()")
+                        dart_lines.append(f"    map[{to_underlined(fieldwrapper.name).upper()}_KEY] = {fieldwrapper.name}.asMap();")
                 else:
-                    dart_lines.append(f"      {fieldwrapper.name.upper()}KEY: this.{fieldwrapper.name},")
-            dart_lines.append("    return {")
-            dart_lines.append("    }")
+                    dart_lines.append(f"    map[{to_underlined(fieldwrapper.name).upper()}_KEY] = {fieldwrapper.name};")
+            dart_lines.append("    return map;")
             dart_lines.append("  }")
-            dart_lines.append("")
-            dart_lines.append("")
+            dart_lines.append("}")
 
         dart_path = os.path.join(self.store_dir, "property_views.dart")
         with open(dart_path, 'w') as f:
