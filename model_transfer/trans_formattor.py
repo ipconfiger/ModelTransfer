@@ -68,8 +68,13 @@ class FormatToTrans(object):
         self.clear_old()
         # dart transform
         dart_lines = []
+        dart_lines.append('abstract class FormBase {')
+        dart_lines.append('  Map<String, dynamic> asMap();')
+        dart_lines.append('  void feedWithMap(Map<String, dynamic> map);')
+        dart_lines.append('}')
+        dart_lines.append('')
         for classwrapper in self.modelfile.classes:
-            dart_lines.append(f"class {classwrapper.class_name} " + "{")
+            dart_lines.append(f"class {classwrapper.class_name} implements FormBase" + "{")
             dart_lines.append("  // consts fields")
             for fieldwrapper in classwrapper.fields:
                 dart_lines.append(f"  static const {to_underlined(fieldwrapper.name).upper()}_KEY = '{to_underlined(fieldwrapper.name)}';")
@@ -83,21 +88,23 @@ class FormatToTrans(object):
             constrctor_params = ", ".join([f"required this.{fieldwrapper.name}" for fieldwrapper in classwrapper.fields])
             dart_lines.append("  %(name)s.make({%(p)s});" % dict(name=classwrapper.class_name, p=constrctor_params))
             dart_lines.append("")
-            dart_lines.append("  %s.fromMap(Map map) {" % classwrapper.class_name)
+            dart_lines.append("  @override")
+            dart_lines.append("  void feedWithMap(Map<String, dynamic> map) {")
             for fieldwrapper in classwrapper.fields:
                 if fieldwrapper.is_complex:
                     if fieldwrapper.is_list:
                         dart_lines.append(f"    {fieldwrapper.name} = <{fieldwrapper.field_type}>[];")
                         dart_lines.append(f"    for (final map in map[{to_underlined(fieldwrapper.name).upper()}_KEY]) " + "{")
-                        dart_lines.append(f"        {fieldwrapper.name}.add({fieldwrapper.field_type}.fromMap(map));")
+                        dart_lines.append(f"        {fieldwrapper.name}.add({fieldwrapper.field_type}()..feedWithMap(map));")
                         dart_lines.append("    }")
                     else:
-                        dart_lines.append(f"    {fieldwrapper.name} = {fieldwrapper.field_type}.fromMap(map[{to_underlined(fieldwrapper.name).upper()}_KEY]);")
+                        dart_lines.append(f"    {fieldwrapper.name} = {fieldwrapper.field_type}()..feedWithMap(map[{to_underlined(fieldwrapper.name).upper()}_KEY]);")
                 else:
                     dart_lines.append(f"    {fieldwrapper.name} = map[{to_underlined(fieldwrapper.name).upper()}_KEY];")
             dart_lines.append("  }")
             dart_lines.append("")
-            dart_lines.append("  Map asMap() {")
+            dart_lines.append("  @override")
+            dart_lines.append("  Map<String, dynamic> asMap() {")
             dart_lines.append("    var map = <String, dynamic>{};")
             for fieldwrapper in classwrapper.fields:
                 if fieldwrapper.is_complex:
