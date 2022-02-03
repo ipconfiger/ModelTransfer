@@ -6,7 +6,7 @@ from models import *
 
 class BaseService(object):
     """基础类"""
-    def __init__(self, db: AsyncSession, mod_class: BaseModel)
+    def __init__(self, db: AsyncSession, mod_class: Base):
         self.db = db
         self.mod = mod_class
 
@@ -19,7 +19,7 @@ class {{classwrapper.class_name}}Service(BaseService):
         super().__init__(db, {{classwrapper.class_name}})
 
     {% for fieldwrapper in classwrapper.fields %}{% if fieldwrapper.is_complex %}async def by{{ fieldwrapper.name.capitalize() }}(self, {{ fieldwrapper.name }}_id):
-        return select({{classwrapper.class_name}}).where({{classwrapper.class_name}}.{{ fieldwrapper.name }} == {{ fieldwrapper.name }}_id).scalars(db)
+        return select({{classwrapper.class_name}}).where({{classwrapper.class_name}}.{{ fieldwrapper.name }} == {{ fieldwrapper.name }}_id).scalars(self.db)
 
     {% endif %}{% endfor %}
 {% endfor %}
