@@ -1,6 +1,10 @@
 import sys
 import os
 
+import click
+import jinja2
+
+from .filters import db_type
 from .draw_formattor import FormatToPdf
 from .transform import ModelFile
 from .jorm_formmator import FormatToJORM
@@ -9,6 +13,7 @@ from .db_formmator import FormatToDatabase
 
 OUTPUT_TYPES = ['jm', 'tm', 'dm', 'pdf']
 
+"""
 def main():
     if len(sys.argv) < 2:
         print('Miss parameter model filepath')
@@ -29,6 +34,40 @@ def main():
         if formatter.name == out_format:
             formatter(modelfile).format()
     print('format done!')
+"""
+
+
+@click.group()
+@click.option('--debug/--no-debug', default=False)
+def cli(debug):
+    click.echo(f"Debug mode is {'on' if debug else 'off'}")
+
+
+@cli.command()
+@click.argument('model_filepath')
+@click.argument('output')
+def trans(model_filepath, output):
+    model_fp = os.path.abspath(model_filepath)
+    if not os.path.exists(model_fp):
+        click.echo('Model File:%s not exists' % model_filepath)
+        sys.exit(1)
+    target_fp = os.path.abspath(output)
+    if not os.path.exists(target_fp):
+        click.echo('Format File:%s not exists' % target_fp)
+        sys.exit(1)
+    modelfile = ModelFile(model_fp)
+    modelfile.process()
+    modelfile.analyze()
+
+    loader = jinja2.FileSystemLoader(os.path.dirname(model_fp))
+    env = jinja2.Environment(autoescape=True, loader=loader)
+    env.filters['db_type'] = db_type
+    template = env.get_template(target_fp.split(os.sep)[-1])
+    print(template.render(mod=modelfile))
+
+
+def main():
+    cli()
 
 
 if __name__ == '__main__':

@@ -1,0 +1,20 @@
+# coding=utf-8
+from uuid import UUID
+from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy_sugar import select, delete
+from models import *
+
+class BaseService(object):
+    """基础类"""
+    def __init__(self, db: AsyncSession, mod_class: BaseModel)
+        self.db = db
+        self.mod = mod_class
+
+    async def byId(self, uid:str):
+        return await db.get(self.mod, UUID(uid))
+{% for classwrapper in mod.classes %}
+class {{classwrapper.class_name}}Service(object):
+    """{{classwrapper.class_name}}'s Service class"""
+    def __init__(self, db: AsyncSession):
+        super().__init__(db, {{classwrapper.class_name}})
+{% endfor %}

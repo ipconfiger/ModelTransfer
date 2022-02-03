@@ -1,0 +1,35 @@
+# coding=utf-8
+from sqlalchemy import Column, String, Integer, Index, Text, Boolean, BigInteger, Numeric, SmallInteger
+from sqlalchemy.ext.declarative import declarative_base, declared_attr
+from sqlalchemy.dialects.postgresql import UUID
+
+import uuid
+import time
+
+
+class ModelBase:
+    @declared_attr
+    def __tablename__(self):
+        return self.__name__.lower()
+
+    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4, unique=True, nullable=False)
+    # 创建时间
+    create_ts = Column(BigInteger, index=True, default=time.time, nullable=False)
+    # 更新时间
+    update_ts = Column(BigInteger, index=True, default=time.time, nullable=False)
+
+
+# 创建对象的基类:
+Base = declarative_base(cls=ModelBase)
+
+{% for classwrapper in mod.classes %}
+class {{classwrapper.class_name}}(Base):
+    {% for fieldwrapper in classwrapper.fields %}{% if fieldwrapper.is_list %}{% elif fieldwrapper.is_complex %}{{fieldwrapper.name}}_id = Column(UUID(as_uuid=True), index=True, nullable=False), doc="{{fieldwrapper.comment}}"){% else %}{{fieldwrapper.name}} = Column({{fieldwrapper|db_type}}, doc="{{fieldwrapper.comment}}"){% endif %}
+    {% endfor %}
+{% endfor %}
+{% for className, field1, field2 in mod.relations.findN2NRelation() %}
+class {{className}}(Base):
+    """{{field1.comment.strip()}}->{{field2.comment.strip()}}"""
+    {{field1.name}}_id = Column(UUID(as_uuid=True), index=True, nullable=False, doc="{{field1.comment}}")
+    {{field2.name}}_id = Column(UUID(as_uuid=True), index=True, nullable=False, doc="{{field2.comment}}")
+{% endfor %}
