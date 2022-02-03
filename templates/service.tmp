@@ -13,8 +13,13 @@ class BaseService(object):
     async def byId(self, uid:str):
         return await db.get(self.mod, UUID(uid))
 {% for classwrapper in mod.classes %}
-class {{classwrapper.class_name}}Service(object):
+class {{classwrapper.class_name}}Service(BaseService):
     """{{classwrapper.class_name}}'s Service class"""
     def __init__(self, db: AsyncSession):
         super().__init__(db, {{classwrapper.class_name}})
+
+    {% for fieldwrapper in classwrapper.fields %}{% if fieldwrapper.is_complex %}async def by{{ fieldwrapper.name.capitalize() }}(self, {{ fieldwrapper.name }}_id):
+        return select({{classwrapper.class_name}}).where({{classwrapper.class_name}}.{{ fieldwrapper.name }} == {{ fieldwrapper.name }}_id).scalars(db)
+
+    {% endif %}{% endfor %}
 {% endfor %}

@@ -24,7 +24,7 @@ def trans(model_filepath, output):
         click.echo('Model File:%s not exists' % model_filepath)
         sys.exit(1)
     target_fp = os.path.abspath(output)
-    if output.startswith('/') or target_fp.startswith("./") or target_fp.startswith('~/') or target_fp.startswith('../'):
+    if output.startswith('/') or output.startswith("./") or output.startswith('~/') or output.startswith('../'):
         if not os.path.exists(target_fp):
             click.echo('Format File:%s not exists' % target_fp)
             sys.exit(1)
@@ -40,6 +40,7 @@ def trans(model_filepath, output):
         if not os.path.exists(target_dir_path):
             os.mkdir(target_dir_path)
         target_file_path = os.path.join(target_dir_path, "%s.tmp" % output)
+        # print('local path:%s' % target_file_path)
         with open(target_file_path, 'w') as f:
             f.write(r.text)
         target_fp = target_file_path
@@ -47,7 +48,7 @@ def trans(model_filepath, output):
     modelfile.process()
     modelfile.analyze()
 
-    loader = jinja2.FileSystemLoader(os.path.dirname(model_fp))
+    loader = jinja2.FileSystemLoader(os.path.dirname(target_fp))
     env = jinja2.Environment(autoescape=True, loader=loader)
     env.filters['db_type'] = db_type
     template = env.get_template(target_fp.split(os.sep)[-1])
