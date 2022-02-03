@@ -24,7 +24,7 @@ Base = declarative_base(cls=ModelBase)
 
 {% for classwrapper in mod.classes %}
 class {{classwrapper.class_name}}(Base):
-    {% for fieldwrapper in classwrapper.fields %}{% if fieldwrapper.is_list %}{% elif fieldwrapper.is_complex %}{{fieldwrapper.name}}_id = Column(UUID(as_uuid=True), index=True, nullable=False, doc="{{fieldwrapper.comment}}"){% else %}{{fieldwrapper.name}} = Column({{fieldwrapper|db_type}}, doc="{{fieldwrapper.comment}}"){% endif %}
+    {% for fieldwrapper in classwrapper.fields %}{% if fieldwrapper.is_list %}{% elif fieldwrapper.is_complex %}{{fieldwrapper.name}}_id = Column(UUID(as_uuid=True), index=True, nullable=False), doc="{{fieldwrapper.comment}}"){% else %}{{fieldwrapper.name}} = Column({{fieldwrapper|db_type}}, doc="{{fieldwrapper.comment}}"){% endif %}
     {% endfor %}
 {% endfor %}
 {% for className, field1, field2 in mod.relations.findN2NRelation() %}
