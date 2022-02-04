@@ -19,7 +19,7 @@ class {{classwrapper.class_name}}Service(BaseService):
         super().__init__(db, {{classwrapper.class_name}})
 
     {% for fieldwrapper in classwrapper.fields %}{% if fieldwrapper.is_complex %}async def by{{ fieldwrapper.name.capitalize() }}(self, {{ fieldwrapper.name }}_id):
-        return select({{classwrapper.class_name}}).where({{classwrapper.class_name}}.{{ fieldwrapper.name }} == {{ fieldwrapper.name }}_id).scalars(self.db)
+        return select({{classwrapper.class_name}}).where({{classwrapper.class_name}}.{{ fieldwrapper.name }}_id == {{ fieldwrapper.name }}_id).scalars(self.db)
 
     {% endif %}{% endfor %}
 {% endfor %}
