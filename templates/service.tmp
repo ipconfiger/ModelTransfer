@@ -11,7 +11,7 @@ class BaseService(object):
         self.mod = mod_class
 
     async def byId(self, uid:str):
-        return await self.db.get(self.mod, UUID(uid))
+        return await self.db.get(self.mod, uid)
 {% for classwrapper in mod.classes %}
 class {{classwrapper.class_name}}Service(BaseService):
     """{{classwrapper.class_name}}'s Service class"""
