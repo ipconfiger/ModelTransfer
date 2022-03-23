@@ -13,7 +13,7 @@ class BaseService(object):
     async def byId(self, uid:str):
         return await self.db.get(self.mod, uid)
 
-        async def fetch(self, mod, *conditions, order_by=None):
+    async def fetch(self, mod, *conditions, order_by=None):
         query = select(mod).where(*conditions)
         if order_by:
             query = query.order_by(order_by)
