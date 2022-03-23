@@ -12,6 +12,40 @@ class BaseService(object):
 
     async def byId(self, uid:str):
         return await self.db.get(self.mod, uid)
+
+        async def fetch(self, mod, *conditions, order_by=None):
+        query = select(mod).where(*conditions)
+        if order_by:
+            query = query.order_by(order_by)
+        return list(await query.scalars(self.db))
+
+    async def query(self, *conditions, order_by=None):
+        return await self.fetch(self.mod, *conditions, order_by=order_by)
+
+    async def fetchOne(self, mod, *conditions, order_by=None):
+        items = await self.fetch(mod, *conditions, order_by=order_by)
+        return items[0] if items else None
+
+    async def queryOne(self, *conditions, order_by=None):
+        return await self.fetchOne(self.mod, *conditions, order_by=order_by)
+
+    async def updateObject(self, mod, *conditions, **values):
+        return await update(mod).where(*conditions).values(**values).execute(self.db)
+
+    async def update(self, *conditions, **values):
+        return await self.updateObject(self.mod, *conditions, **values)
+
+    async def deleteObject(self, mod, *conditions):
+        return await delete(mod).where(*conditions).execute(self.db)
+
+    async def delete(self, *conditions):
+        return await self.deleteObject(*conditions)
+
+    async def add(self, item):
+        self.db.add(item)
+        await self.db.flush()
+        return item
+
 {% for classwrapper in mod.classes %}
 class {{classwrapper.class_name}}Service(BaseService):
     """{{classwrapper.class_name}}'s Service class"""
