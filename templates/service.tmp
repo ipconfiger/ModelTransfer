@@ -2,7 +2,9 @@
 from uuid import UUID
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy_sugar import select, delete
+from database import update
 from models import *
+
 
 class BaseService(object):
     """基础类"""
