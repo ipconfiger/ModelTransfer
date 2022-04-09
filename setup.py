@@ -4,7 +4,7 @@ __author__ = 'liming'
 from setuptools import setup
 
 setup(name='model_transfer',
-      version='0.0.3',
+      version='0.0.4',
       description='Convert Model Lang to All Kinds of model classes',
       url='https://github.com/ipconfiger',
       author='Alexander.Li',

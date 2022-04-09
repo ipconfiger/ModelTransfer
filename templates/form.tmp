@@ -3,6 +3,8 @@ from typing import List
 from pydantic import BaseModel, Field
 
 {% for classwrapper in mod.classes %}class {{ classwrapper.class_name }}(BaseModel):
-    {% for field in classwrapper.fields %}{{ field.name }}: {{ field.field_type }}
+    {% for field in classwrapper.fields %}{{ field.name }}: {%if field.is_list%}List[{{ field.field_type }}]{%else%}{{ field.field_type }}{%endif%}
     {% endfor %}
+
 {% endfor %}
+

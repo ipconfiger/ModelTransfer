@@ -100,7 +100,8 @@ class FieldWrapper(object):
     def analyze(self):
         if self.is_complex:
             if not self.global_env.class_exists(self.field_type):
-                raise SyntaxException(f'Sub type {self.field_type} not exist')
+                if self.field_type not in ['str', 'int', 'float', 'dict']:
+                    raise SyntaxException(f'Sub type {self.field_type} not exist')
             self.global_env.relations.add_relation(self.classwrapper.class_name, self.field_type, self,
                                                RelationType.CONTAINS if self.is_list else RelationType.POINTTO)
 
