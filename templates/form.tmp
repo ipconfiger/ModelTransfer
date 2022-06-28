@@ -11,7 +11,8 @@ from pydantic import BaseModel, Field
 class {{ classwrapper.class_name }}Convertor:
     def __init__(self, modal):
         self.model: {{ classwrapper.class_name }}Item = {{ classwrapper.class_name }}Item()
-        {% for field in classwrapper.fields %}{%if field.is_list%}{%else%}{%if field.is_complex%}{%else%}self.model.{{ field.name }} = modal.{{ field.name }}{%endif%}{%endif%}{% endfor %}
+        {% for field in classwrapper.fields %}{%if field.is_list%}{%else%}{%if field.is_complex%}{%else%}self.model.{{ field.name }} = modal.{{ field.name }}{%endif%}{%endif%}
+        {% endfor %}
 
 {% endfor %}
 
