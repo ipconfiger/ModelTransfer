@@ -28,11 +28,19 @@ class FormatToPdf(object):
             lines.append(f"{fieldwrapper.name}\t:\t{fieldwrapper.field_type}\t\t{fieldwrapper.comment}")
         return "\r\n".join(lines)
 
+    def table_view(self, classwrapper):
+        rows = []
+        for fieldwrapper in classwrapper.fields:
+            rows.append([fieldwrapper.name, fieldwrapper.field_type, fieldwrapper.comment])
+        rows.insert(0, ["模型:", classwrapper.class_name, classwrapper.comment])
+        return "<<table>%s</table>>" % "".join(["<tr>%s</tr>" % "".join(["<td>%s</td>" % c for c in r]) for r in rows])
+
     def format(self):
         self.clear_old()
         dot = Digraph(name="models", comment=self.modelfile.model_filepath, format="pdf")
         for classwrapper in self.modelfile.classes:
-            dot.node(classwrapper.class_name, label=self.class_view(classwrapper), shape="box", fontsize="6", height=f"{0.4*len(classwrapper.fields)}")
+            # height=f"{0.4*len(classwrapper.fields)}"
+            dot.node(classwrapper.class_name, label=self.table_view(classwrapper), shape="box", fontsize="6")
 
         for class_name, relations in self.modelfile.relations.targets.items():
             for referenceItem in relations:

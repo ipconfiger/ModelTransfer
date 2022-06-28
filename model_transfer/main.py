@@ -4,6 +4,7 @@ import os
 import click
 import jinja2
 import requests
+from .draw_formattor import FormatToPdf
 
 from .filters import db_type
 from .transform import ModelFile
@@ -23,7 +24,16 @@ def trans(model_filepath, output):
     if not os.path.exists(model_fp):
         click.echo('Model File:%s not exists' % model_filepath)
         sys.exit(1)
+
     target_fp = os.path.abspath(output)
+    if output.endswith('.pdf'):
+        modelfile = ModelFile(model_fp)
+        modelfile.process()
+        modelfile.analyze()
+        fmt = FormatToPdf(modelfile)
+        fmt.format()
+        return
+
     if output.startswith('/') or output.startswith("./") or output.startswith('~/') or output.startswith('../'):
         if not os.path.exists(target_fp):
             click.echo('Format File:%s not exists' % target_fp)
