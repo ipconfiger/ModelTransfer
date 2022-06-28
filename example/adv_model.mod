@@ -88,7 +88,7 @@ LocationPrice:
   - period:int              # 发布时段
   - location:Location       # 所在点位
   - price:float             # 价格
-  - files:List[str]
+  - files:List[str]         # 文件列表
 
 
 
