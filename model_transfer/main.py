@@ -1,5 +1,6 @@
 import sys
 import os
+import time
 
 import click
 import jinja2
@@ -39,7 +40,7 @@ def trans(model_filepath, output):
             click.echo('Format File:%s not exists' % target_fp)
             sys.exit(1)
     else:
-        uri = 'https://raw.githubusercontent.com/ipconfiger/ModelTransfer/main/templates/%s.tmp' % output
+        uri = 'https://raw.githubusercontent.com/ipconfiger/ModelTransfer/main/templates/%s.tmp?v=%s' % (output, time.time())
         r = requests.get(uri)
         try:
             r.raise_for_status()

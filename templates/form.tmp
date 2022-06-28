@@ -3,8 +3,15 @@ from typing import List
 from pydantic import BaseModel, Field
 
 {% for classwrapper in mod.classes %}class {{ classwrapper.class_name }}Item(BaseModel):
+    id: str = Field(None, title="序号")
     {% for field in classwrapper.fields %}{{ field.name }}: {%if field.is_list%}List[{{ field.field_type }}]{%else%}{%if field.is_complex%}{{field.field_type}}Item{%else%}{{ field.field_type }}{%endif%}{%endif%} = Field(None, title="{{ field.comment }}")
     {% endfor %}
+
+
+class {{ classwrapper.class_name }}Convertor:
+    def __init__(self, modal):
+        self.model: {{ classwrapper.class_name }}Item = {{ classwrapper.class_name }}Item()
+        {% for field in classwrapper.fields %}{%if field.is_list%}{%else%}{%if field.is_complex%}{%else%}self.model.{{ field.name }} = modal.{{ field.name }}{%endif%}{%endif%}{% endfor %}
 
 {% endfor %}
 
